@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Interno | Controle de Extintores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="painel.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div>
+        <div class="logo-box">
+          <div class="logo-icon">🧯</div>
+          <div>
+            <h2>Previna-se</h2>
+            <p>Painel interno</p>
+          </div>
+        </div>
+
+        <nav class="menu">
+          <a href="#" class="active">Dashboard</a>
+          <a href="#">Extintores</a>
+          <a href="#">Inspeções</a>
+          <a href="#">Relatórios</a>
+          <a href="#">Configurações</a>
+        </nav>
+      </div>
+
+      <a href="/logout" class="logout-btn">Sair</a>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h1>Controle de Extintores</h1>
+          <p>Acompanhe status, vencimentos e inspeções em tempo real.</p>
+        </div>
+        <div class="user-box">Usuário interno</div>
+      </header>
+
+      <section class="cards">
+        <div class="card info-card red">
+          <span>Total de extintores</span>
+          <strong>48</strong>
+        </div>
+
+        <div class="card info-card yellow">
+          <span>Próximos do vencimento</span>
+          <strong>12</strong>
+        </div>
+
+        <div class="card info-card green">
+          <span>Em dia</span>
+          <strong>30</strong>
+        </div>
+
+        <div class="card info-card dark">
+          <span>Vencidos</span>
+          <strong>6</strong>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <div class="card chart-card">
+          <div class="section-title">
+            <h2>Controle geral</h2>
+            <p>Distribuição atual dos extintores</p>
+          </div>
+          <div class="chart-container">
+            <canvas id="graficoExtintores"></canvas>
+          </div>
+        </div>
+
+        <div class="card alerts-card">
+          <div class="section-title">
+            <h2>Alertas rápidos</h2>
+            <p>Itens que merecem atenção</p>
+          </div>
+
+          <div class="alert-item danger">
+            <strong>6 extintores vencidos</strong>
+            <span>Necessário realizar troca ou recarga imediata.</span>
+          </div>
+
+          <div class="alert-item warning">
+            <strong>12 próximos do vencimento</strong>
+            <span>Validade termina nos próximos 30 dias.</span>
+          </div>
+
+          <div class="alert-item success">
+            <strong>30 extintores em dia</strong>
+            <span>Todos com manutenção regularizada.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card table-card">
+        <div class="section-title table-header">
+          <div>
+            <h2>Lista de extintores</h2>
+            <p>Controle interno por setor e validade</p>
+          </div>
+          <button class="new-btn">+ Novo extintor</button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Local</th>
+                <th>Validade</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>001</td>
+                <td>Pó Químico</td>
+                <td>Recepção</td>
+                <td>15/04/2026</td>
+                <td><span class="status status-warning">Próximo</span></td>
+              </tr>
+              <tr>
+                <td>002</td>
+                <td>CO₂</td>
+                <td>Almoxarifado</td>
+                <td>02/11/2026</td>
+                <td><span class="status status-ok">Em dia</span></td>
+              </tr>
+              <tr>
+                <td>003</td>
+                <td>Água Pressurizada</td>
+                <td>Corredor A</td>
+                <td>28/03/2026</td>
+                <td><span class="status status-danger">Vencido</span></td>
+              </tr>
+              <tr>
+                <td>004</td>
+                <td>Pó Químico</td>
+                <td>Sala TI</td>
+                <td>10/05/2026</td>
+                <td><span class="status status-warning">Próximo</span></td>
+              </tr>
+              <tr>
+                <td>005</td>
+                <td>CO₂</td>
+                <td>Cozinha</td>
+                <td>20/12/2026</td>
+                <td><span class="status status-ok">Em dia</span></td>
+              </tr>
+              <tr>
+                <td>006</td>
+                <td>Espuma Mecânica</td>
+                <td>Estoque</td>
+                <td>11/03/2026</td>
+                <td><span class="status status-danger">Vencido</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="painel.js"></script>
+</body>
+</html>
