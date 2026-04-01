@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="painel.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -33,11 +34,11 @@
         </nav>
       </div>
 
-        <div class="sidebar-actions">
+      <div class="sidebar-actions">
         <a href="/modulos" class="back-btn">Voltar</a>
         <a href="/logout" class="logout-btn">Sair</a>
-        </div>
-      </aside>
+      </div>
+    </aside>
 
     <main class="main-content">
       <header class="topbar">
@@ -182,6 +183,9 @@
             <div>
               <h2>Lista de extintores</h2>
               <p>Controle interno por setor e validade</p>
+            </div>
+            <div class="actions-inline">
+              <button class="new-btn" id="btnPdfExtintores">Gerar PDF</button>
             </div>
           </div>
 
@@ -339,9 +343,59 @@
           <p id="mensagemConfig" class="mensagem-form"></p>
         </div>
       </section>
+
+      <!-- HISTÓRICO -->
+      <section class="card table-card">
+        <div class="section-title">
+          <h2>Histórico de movimentações</h2>
+          <p>Cadastro, edição, exclusão e relatórios</p>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Módulo</th>
+                <th>Ação</th>
+                <th>Descrição</th>
+                <th>Data e hora</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaHistoricoExtintores"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- BACKUP -->
+      <section class="card">
+        <div class="section-title">
+          <h2>Backup de dados</h2>
+          <p>Exporte ou importe as informações do sistema</p>
+        </div>
+
+        <div class="actions-inline top-space">
+          <button type="button" id="btnExportarBackupExt" class="new-btn">Exportar backup</button>
+          <label class="secondary-btn fake-input-file">
+            Importar backup
+            <input type="file" id="arquivoBackupExt" accept=".json">
+          </label>
+        </div>
+
+        <p id="mensagemBackupExt" class="mensagem-form"></p>
+      </section>
     </main>
   </div>
 
+  <!-- MODAL QR -->
+  <div class="modal hidden" id="modalQrExt">
+    <div class="modal-content">
+      <h3>QR Code do extintor</h3>
+      <div id="qrCodeBoxExt"></div>
+      <button type="button" id="fecharModalQrExt" class="secondary-btn top-space">Fechar</button>
+    </div>
+  </div>
+
+  <script src="sistema-utils.js"></script>
   <script src="painel.js"></script>
 </body>
 </html>

@@ -1,38 +1,34 @@
-const CHAVE_EXTINTORES = "extintores_previna";
-const CHAVE_INSPECOES = "inspecoes_previna";
-const CHAVE_CONFIG = "config_previna";
-
 let grafico = null;
 
 function obterExtintores() {
-  return JSON.parse(localStorage.getItem(CHAVE_EXTINTORES)) || [];
+  return JSON.parse(localStorage.getItem("extintores_previna")) || [];
 }
 
 function salvarExtintores(lista) {
-  localStorage.setItem(CHAVE_EXTINTORES, JSON.stringify(lista));
+  localStorage.setItem("extintores_previna", JSON.stringify(lista));
 }
 
 function obterInspecoes() {
-  return JSON.parse(localStorage.getItem(CHAVE_INSPECOES)) || [];
+  return JSON.parse(localStorage.getItem("inspecoes_previna")) || [];
 }
 
 function salvarInspecoes(lista) {
-  localStorage.setItem(CHAVE_INSPECOES, JSON.stringify(lista));
+  localStorage.setItem("inspecoes_previna", JSON.stringify(lista));
 }
 
 function obterConfig() {
-  return JSON.parse(localStorage.getItem(CHAVE_CONFIG)) || {
+  return JSON.parse(localStorage.getItem("config_previna")) || {
     nomeEmpresa: "Previna-se",
     diasAlerta: 30
   };
 }
 
 function salvarConfig(config) {
-  localStorage.setItem(CHAVE_CONFIG, JSON.stringify(config));
+  localStorage.setItem("config_previna", JSON.stringify(config));
 }
 
 function criarDadosIniciais() {
-  if (!localStorage.getItem(CHAVE_EXTINTORES)) {
+  if (!localStorage.getItem("extintores_previna")) {
     salvarExtintores([
       { id: 1, tipo: "Pó Químico", local: "Recepção", validade: "2026-04-15", numeroSerie: "PQ-1001" },
       { id: 2, tipo: "CO₂", local: "Almoxarifado", validade: "2026-11-02", numeroSerie: "CO2-2030" },
@@ -40,7 +36,7 @@ function criarDadosIniciais() {
     ]);
   }
 
-  if (!localStorage.getItem(CHAVE_INSPECOES)) {
+  if (!localStorage.getItem("inspecoes_previna")) {
     salvarInspecoes([
       {
         extintorId: 1,
@@ -67,14 +63,8 @@ function calcularStatus(validade) {
   const dataValidade = new Date(validade + "T00:00:00");
   const diferenca = Math.ceil((dataValidade - hoje) / (1000 * 60 * 60 * 24));
 
-  if (diferenca < 0) {
-    return { texto: "Vencido", classe: "status-danger" };
-  }
-
-  if (diferenca <= Number(config.diasAlerta)) {
-    return { texto: "Próximo", classe: "status-warning" };
-  }
-
+  if (diferenca < 0) return { texto: "Vencido", classe: "status-danger" };
+  if (diferenca <= Number(config.diasAlerta)) return { texto: "Próximo", classe: "status-warning" };
   return { texto: "Em dia", classe: "status-ok" };
 }
 
@@ -108,9 +98,7 @@ function atualizarDashboard() {
 function atualizarGrafico(emDia, proximos, vencidos) {
   const ctx = document.getElementById("graficoExtintores");
 
-  if (grafico) {
-    grafico.destroy();
-  }
+  if (grafico) grafico.destroy();
 
   grafico = new Chart(ctx, {
     type: "doughnut",
@@ -129,10 +117,7 @@ function atualizarGrafico(emDia, proximos, vencidos) {
       plugins: {
         legend: {
           position: "bottom",
-          labels: {
-            padding: 18,
-            usePointStyle: true
-          }
+          labels: { padding: 18, usePointStyle: true }
         }
       }
     }
@@ -144,7 +129,6 @@ function renderTabelaDashboard() {
   const extintores = obterExtintores().slice(-5).reverse();
 
   tbody.innerHTML = "";
-
   extintores.forEach((extintor) => {
     const status = calcularStatus(extintor.validade);
     tbody.innerHTML += `
@@ -162,7 +146,6 @@ function renderTabelaDashboard() {
 function renderExtintores() {
   const tbody = document.getElementById("tabelaExtintores");
   const extintores = obterExtintores();
-
   tbody.innerHTML = "";
 
   extintores.forEach((extintor) => {
@@ -179,6 +162,7 @@ function renderExtintores() {
         <td>
           <button class="btn-acao btn-editar" onclick="editarExtintor(${extintor.id})">Editar</button>
           <button class="btn-acao btn-excluir" onclick="excluirExtintor(${extintor.id})">Excluir</button>
+          <button class="btn-acao btn-editar" onclick="mostrarQrExtintor(${extintor.id})">QR</button>
         </td>
       </tr>
     `;
@@ -192,20 +176,14 @@ function atualizarSelectExtintores() {
   const extintores = obterExtintores();
 
   select.innerHTML = `<option value="">Selecione</option>`;
-
   extintores.forEach((extintor) => {
-    select.innerHTML += `
-      <option value="${extintor.id}">
-        ${extintor.tipo} - ${extintor.local}
-      </option>
-    `;
+    select.innerHTML += `<option value="${extintor.id}">${extintor.tipo} - ${extintor.local}</option>`;
   });
 }
 
 function renderInspecoes() {
   const tbody = document.getElementById("tabelaInspecoes");
   const inspecoes = obterInspecoes().slice().reverse();
-
   tbody.innerHTML = "";
 
   inspecoes.forEach((inspecao) => {
@@ -250,6 +228,23 @@ function renderRelatorios() {
   `;
 }
 
+function renderHistoricoExtintores() {
+  const tbody = document.getElementById("tabelaHistoricoExtintores");
+  const historico = obterHistoricoGeral().slice().reverse();
+  tbody.innerHTML = "";
+
+  historico.forEach((item) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${item.modulo}</td>
+        <td>${item.acao}</td>
+        <td>${item.descricao}</td>
+        <td>${item.dataHora}</td>
+      </tr>
+    `;
+  });
+}
+
 function carregarConfiguracoes() {
   const config = obterConfig();
   document.getElementById("nomeEmpresa").value = config.nomeEmpresa;
@@ -284,17 +279,25 @@ function excluirExtintor(id) {
   inspecoes = inspecoes.filter((item) => item.extintorId !== id);
   salvarInspecoes(inspecoes);
 
+  registrarHistorico("Extintores", "Exclusão", `Extintor excluído: ID ${id}`);
   atualizarTudo();
 }
 
-function mostrarSecao(secao) {
-  document.querySelectorAll(".section-content").forEach((item) => {
-    item.classList.remove("active-section");
-  });
+function mostrarQrExtintor(id) {
+  const extintor = obterExtintores().find((item) => item.id === id);
+  if (!extintor) return;
 
-  document.querySelectorAll(".menu-link").forEach((item) => {
-    item.classList.remove("active");
-  });
+  gerarQrCodeNoElemento(
+    "qrCodeBoxExt",
+    `Extintor ID ${extintor.id} | ${extintor.tipo} | Local: ${extintor.local} | Série: ${extintor.numeroSerie} | Validade: ${extintor.validade}`
+  );
+
+  document.getElementById("modalQrExt").classList.remove("hidden");
+}
+
+function mostrarSecao(secao) {
+  document.querySelectorAll(".section-content").forEach((item) => item.classList.remove("active-section"));
+  document.querySelectorAll(".menu-link").forEach((item) => item.classList.remove("active"));
 
   document.getElementById(`sec-${secao}`).classList.add("active-section");
   document.querySelector(`.menu-link[data-section="${secao}"]`).classList.add("active");
@@ -316,6 +319,7 @@ function atualizarTudo() {
   renderExtintores();
   renderInspecoes();
   renderRelatorios();
+  renderHistoricoExtintores();
   carregarConfiguracoes();
 }
 
@@ -332,20 +336,17 @@ document.getElementById("formExtintor").addEventListener("submit", function (e) 
 
   if (idEdicao) {
     extintores = extintores.map((item) =>
-      item.id === Number(idEdicao)
-        ? { ...item, tipo, local, validade, numeroSerie }
-        : item
+      item.id === Number(idEdicao) ? { ...item, tipo, local, validade, numeroSerie } : item
     );
+    registrarHistorico("Extintores", "Edição", `Extintor atualizado: ${tipo} - ${local}`);
     document.getElementById("mensagemExtintor").textContent = "Extintor atualizado com sucesso!";
   } else {
     const novo = {
       id: extintores.length ? Math.max(...extintores.map((item) => item.id)) + 1 : 1,
-      tipo,
-      local,
-      validade,
-      numeroSerie
+      tipo, local, validade, numeroSerie
     };
     extintores.push(novo);
+    registrarHistorico("Extintores", "Cadastro", `Extintor cadastrado: ${tipo} - ${local}`);
     document.getElementById("mensagemExtintor").textContent = "Extintor cadastrado com sucesso!";
   }
 
@@ -371,7 +372,6 @@ document.getElementById("formInspecao").addEventListener("submit", function (e) 
   const observacoes = document.getElementById("observacoesInspecao").value;
 
   const extintor = obterExtintores().find((item) => item.id === extintorId);
-
   if (!extintor) return;
 
   const inspecoes = obterInspecoes();
@@ -385,6 +385,7 @@ document.getElementById("formInspecao").addEventListener("submit", function (e) 
   });
 
   salvarInspecoes(inspecoes);
+  registrarHistorico("Extintores", "Inspeção", `Inspeção registrada para ${extintor.tipo} - ${extintor.local}`);
   this.reset();
   document.getElementById("mensagemInspecao").textContent = "Inspeção registrada com sucesso!";
   atualizarTudo();
@@ -396,11 +397,8 @@ document.getElementById("formConfiguracoes").addEventListener("submit", function
   const nomeEmpresa = document.getElementById("nomeEmpresa").value;
   const diasAlerta = document.getElementById("diasAlerta").value;
 
-  salvarConfig({
-    nomeEmpresa,
-    diasAlerta: Number(diasAlerta)
-  });
-
+  salvarConfig({ nomeEmpresa, diasAlerta: Number(diasAlerta) });
+  registrarHistorico("Extintores", "Configuração", `Configurações atualizadas: ${nomeEmpresa}`);
   document.getElementById("mensagemConfig").textContent = "Configurações salvas com sucesso!";
   atualizarTudo();
 });
@@ -410,6 +408,43 @@ document.querySelectorAll(".menu-link").forEach((link) => {
     e.preventDefault();
     mostrarSecao(this.dataset.section);
   });
+});
+
+document.getElementById("btnPdfExtintores")?.addEventListener("click", function () {
+  const elemento = document.querySelector(".table-card");
+  html2pdf().from(elemento).set({
+    margin: 10,
+    filename: "relatorio-extintores.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  }).save();
+
+  registrarHistorico("Extintores", "PDF", "Relatório de extintores gerado em PDF");
+});
+
+document.getElementById("btnExportarBackupExt")?.addEventListener("click", function () {
+  exportarBackupCompleto();
+  document.getElementById("mensagemBackupExt").textContent = "Backup exportado com sucesso!";
+});
+
+document.getElementById("arquivoBackupExt")?.addEventListener("change", function () {
+  const arquivo = this.files[0];
+  if (!arquivo) return;
+
+  importarBackupCompleto(arquivo, function (sucesso) {
+    document.getElementById("mensagemBackupExt").textContent = sucesso
+      ? "Backup importado com sucesso!"
+      : "Erro ao importar backup.";
+    if (sucesso) {
+      atualizarTudo();
+      location.reload();
+    }
+  });
+});
+
+document.getElementById("fecharModalQrExt")?.addEventListener("click", function () {
+  document.getElementById("modalQrExt").classList.add("hidden");
 });
 
 criarDadosIniciais();

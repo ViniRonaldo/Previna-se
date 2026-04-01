@@ -439,3 +439,93 @@ th {
 .logout-btn:hover {
   background: rgba(255,255,255,0.12);
 }
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.back-btn,
+.logout-btn {
+  text-decoration: none;
+  color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: 0.3s;
+  text-align: center;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.08);
+}
+
+.back-btn:hover,
+.logout-btn:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.btn-acao {
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.btn-editar {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.btn-excluir {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.actions-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.top-space {
+  margin-top: 12px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 18px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.fake-input-file {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fake-input-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}

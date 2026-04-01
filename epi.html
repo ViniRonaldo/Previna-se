@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="epi.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div class="layout">
@@ -27,10 +30,14 @@
           <a href="#" class="menu-link" data-section="epis">EPIs</a>
           <a href="#" class="menu-link" data-section="retiradas">Ficha de retirada</a>
           <a href="#" class="menu-link" data-section="historico">Histórico</a>
+          <a href="#" class="menu-link" data-section="backup">Backup</a>
         </nav>
       </div>
 
-      <a href="/modulos" class="logout-btn">Voltar</a>
+      <div class="sidebar-actions">
+        <a href="/modulos" class="back-btn">Voltar</a>
+        <a href="/logout" class="logout-btn">Sair</a>
+      </div>
     </aside>
 
     <main class="main-content">
@@ -41,7 +48,6 @@
         </div>
       </header>
 
-      <!-- DASHBOARD -->
       <section id="sec-dashboard" class="section-content active-section">
         <section class="cards">
           <div class="card info-card blue">
@@ -103,7 +109,6 @@
         </section>
       </section>
 
-      <!-- FUNCIONÁRIOS -->
       <section id="sec-funcionarios" class="section-content">
         <div class="card form-card">
           <div class="section-title">
@@ -166,7 +171,6 @@
         </div>
       </section>
 
-      <!-- EPIS -->
       <section id="sec-epis" class="section-content">
         <div class="card form-card">
           <div class="section-title">
@@ -241,7 +245,6 @@
         </div>
       </section>
 
-      <!-- RETIRADAS -->
       <section id="sec-retiradas" class="section-content">
         <div class="card form-card">
           <div class="section-title">
@@ -276,8 +279,16 @@
             </div>
 
             <div>
-              <label for="assinaturaRetirada">Assinatura / confirmação</label>
+              <label for="assinaturaRetirada">Assinatura digitada</label>
               <input type="text" id="assinaturaRetirada" placeholder="Nome do funcionário" required>
+            </div>
+
+            <div class="full-width">
+              <label>Assinatura digital simples</label>
+              <canvas id="canvasAssinatura" class="signature-canvas"></canvas>
+              <div class="actions-inline top-space">
+                <button type="button" id="limparAssinatura" class="secondary-btn">Limpar assinatura</button>
+              </div>
             </div>
 
             <div class="full-width">
@@ -285,44 +296,92 @@
               <textarea id="observacaoRetirada" rows="4"></textarea>
             </div>
 
-            <div class="full-width">
+            <div class="full-width actions-inline">
               <button type="submit" class="primary-btn">Registrar retirada</button>
+              <button type="button" id="btnImprimirFicha" class="secondary-btn">Imprimir ficha</button>
+              <button type="button" id="btnPdfFicha" class="secondary-btn">Gerar PDF</button>
             </div>
           </form>
 
           <p id="mensagemRetirada" class="mensagem-form"></p>
         </div>
+
+        <div class="card" id="fichaEntrega">
+          <div class="section-title">
+            <h2>Prévia da ficha de entrega</h2>
+            <p>Use para imprimir ou gerar PDF</p>
+          </div>
+
+          <div class="ficha-box" id="conteudoFicha">
+            <h3>Ficha de Entrega de EPI</h3>
+            <p><strong>Funcionário:</strong> <span id="prevFuncionario">-</span></p>
+            <p><strong>Item:</strong> <span id="prevItem">-</span></p>
+            <p><strong>Quantidade:</strong> <span id="prevQuantidade">-</span></p>
+            <p><strong>Data:</strong> <span id="prevData">-</span></p>
+            <p><strong>Responsável:</strong> <span id="prevResponsavel">-</span></p>
+            <p><strong>Confirmação:</strong> <span id="prevAssinaturaDigitada">-</span></p>
+            <p><strong>Observação:</strong> <span id="prevObservacao">-</span></p>
+            <div class="assinatura-preview">
+              <strong>Assinatura digital:</strong>
+              <img id="prevAssinaturaImagem" alt="Assinatura digital">
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- HISTÓRICO -->
       <section id="sec-historico" class="section-content">
         <div class="card">
           <div class="section-title">
-            <h2>Histórico de retiradas</h2>
-            <p>Controle de objetos e EPIs entregues</p>
+            <h2>Histórico de movimentações</h2>
+            <p>Controle de cadastros, edições, retiradas e exclusões</p>
           </div>
 
           <div class="table-wrapper">
             <table>
               <thead>
                 <tr>
-                  <th>Funcionário</th>
-                  <th>Item</th>
-                  <th>Quantidade</th>
-                  <th>Data</th>
-                  <th>Responsável</th>
-                  <th>Confirmação</th>
-                  <th>Observação</th>
+                  <th>Módulo</th>
+                  <th>Ação</th>
+                  <th>Descrição</th>
+                  <th>Data e hora</th>
                 </tr>
               </thead>
-              <tbody id="tabelaRetiradas"></tbody>
+              <tbody id="tabelaHistoricoEpi"></tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      <section id="sec-backup" class="section-content">
+        <div class="card">
+          <div class="section-title">
+            <h2>Backup de dados</h2>
+            <p>Exporte ou importe as informações do sistema</p>
+          </div>
+
+          <div class="actions-inline top-space">
+            <button type="button" id="btnExportarBackup" class="primary-btn">Exportar backup</button>
+            <label class="secondary-btn fake-input-file">
+              Importar backup
+              <input type="file" id="arquivoBackup" accept=".json">
+            </label>
+          </div>
+
+          <p id="mensagemBackup" class="mensagem-form"></p>
         </div>
       </section>
     </main>
   </div>
 
+  <div class="modal hidden" id="modalQr">
+    <div class="modal-content">
+      <h3>QR Code do item</h3>
+      <div id="qrCodeBox"></div>
+      <button type="button" id="fecharModalQr" class="secondary-btn top-space">Fechar</button>
+    </div>
+  </div>
+
+  <script src="sistema-utils.js"></script>
   <script src="epi.js"></script>
 </body>
 </html>

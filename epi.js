@@ -2,6 +2,8 @@ const CHAVE_FUNCIONARIOS = "epi_funcionarios";
 const CHAVE_EPIS = "epi_itens";
 const CHAVE_RETIRADAS = "epi_retiradas";
 
+let assinaturaPad;
+
 function obterFuncionarios() {
   return JSON.parse(localStorage.getItem(CHAVE_FUNCIONARIOS)) || [];
 }
@@ -54,14 +56,8 @@ function formatarData(data) {
 }
 
 function obterStatusEpi(epi) {
-  if (Number(epi.estoque) <= 0) {
-    return { texto: "Sem estoque", classe: "status-danger" };
-  }
-
-  if (Number(epi.estoque) <= Number(epi.minimo)) {
-    return { texto: "Estoque baixo", classe: "status-warning" };
-  }
-
+  if (Number(epi.estoque) <= 0) return { texto: "Sem estoque", classe: "status-danger" };
+  if (Number(epi.estoque) <= Number(epi.minimo)) return { texto: "Estoque baixo", classe: "status-warning" };
   return { texto: "Disponível", classe: "status-ok" };
 }
 
@@ -142,6 +138,7 @@ function renderEpis() {
         <td>
           <button class="btn-acao btn-editar" onclick="editarEpi(${epi.id})">Editar</button>
           <button class="btn-acao btn-excluir" onclick="excluirEpi(${epi.id})">Excluir</button>
+          <button class="btn-acao btn-editar" onclick="mostrarQrEpi(${epi.id})">QR</button>
         </td>
       </tr>
     `;
@@ -150,21 +147,18 @@ function renderEpis() {
   atualizarSelects();
 }
 
-function renderRetiradas() {
-  const tbody = document.getElementById("tabelaRetiradas");
-  const retiradas = obterRetiradas().slice().reverse();
+function renderHistoricoEpi() {
+  const tbody = document.getElementById("tabelaHistoricoEpi");
+  const historico = obterHistoricoGeral().slice().reverse();
   tbody.innerHTML = "";
 
-  retiradas.forEach(retirada => {
+  historico.forEach(item => {
     tbody.innerHTML += `
       <tr>
-        <td>${retirada.funcionarioNome}</td>
-        <td>${retirada.epiNome}</td>
-        <td>${retirada.quantidade}</td>
-        <td>${formatarData(retirada.data)}</td>
-        <td>${retirada.responsavel}</td>
-        <td>${retirada.assinatura}</td>
-        <td>${retirada.observacao || "-"}</td>
+        <td>${item.modulo}</td>
+        <td>${item.acao}</td>
+        <td>${item.descricao}</td>
+        <td>${item.dataHora}</td>
       </tr>
     `;
   });
@@ -186,6 +180,25 @@ function atualizarSelects() {
   });
 }
 
+function atualizarPreviaFicha() {
+  const funcionarioSelect = document.getElementById("retiradaFuncionario");
+  const epiSelect = document.getElementById("retiradaEpi");
+
+  document.getElementById("prevFuncionario").textContent = funcionarioSelect.options[funcionarioSelect.selectedIndex]?.text || "-";
+  document.getElementById("prevItem").textContent = epiSelect.options[epiSelect.selectedIndex]?.text || "-";
+  document.getElementById("prevQuantidade").textContent = document.getElementById("quantidadeRetirada").value || "-";
+  document.getElementById("prevData").textContent = formatarData(document.getElementById("dataRetirada").value) || "-";
+  document.getElementById("prevResponsavel").textContent = document.getElementById("responsavelEntrega").value || "-";
+  document.getElementById("prevAssinaturaDigitada").textContent = document.getElementById("assinaturaRetirada").value || "-";
+  document.getElementById("prevObservacao").textContent = document.getElementById("observacaoRetirada").value || "-";
+
+  if (!assinaturaPad.isEmpty()) {
+    document.getElementById("prevAssinaturaImagem").src = assinaturaPad.toDataURL();
+  } else {
+    document.getElementById("prevAssinaturaImagem").src = "";
+  }
+}
+
 function editarFuncionario(id) {
   const funcionario = obterFuncionarios().find(item => item.id === id);
   if (!funcionario) return;
@@ -201,9 +214,9 @@ function editarFuncionario(id) {
 
 function excluirFuncionario(id) {
   if (!confirm("Deseja excluir este funcionário?")) return;
-
   const lista = obterFuncionarios().filter(item => item.id !== id);
   salvarFuncionarios(lista);
+  registrarHistorico("EPI", "Exclusão", `Funcionário excluído: ID ${id}`);
   atualizarTudo();
 }
 
@@ -224,20 +237,27 @@ function editarEpi(id) {
 
 function excluirEpi(id) {
   if (!confirm("Deseja excluir este EPI?")) return;
-
   const lista = obterEpis().filter(item => item.id !== id);
   salvarEpis(lista);
+  registrarHistorico("EPI", "Exclusão", `Item excluído: ID ${id}`);
   atualizarTudo();
 }
 
-function mostrarSecao(secao) {
-  document.querySelectorAll(".section-content").forEach(item => {
-    item.classList.remove("active-section");
-  });
+function mostrarQrEpi(id) {
+  const epi = obterEpis().find(item => item.id === id);
+  if (!epi) return;
 
-  document.querySelectorAll(".menu-link").forEach(item => {
-    item.classList.remove("active");
-  });
+  gerarQrCodeNoElemento(
+    "qrCodeBox",
+    `EPI: ${epi.nome} | Categoria: ${epi.categoria} | CA: ${epi.ca} | Estoque: ${epi.estoque}`
+  );
+
+  document.getElementById("modalQr").classList.remove("hidden");
+}
+
+function mostrarSecao(secao) {
+  document.querySelectorAll(".section-content").forEach(item => item.classList.remove("active-section"));
+  document.querySelectorAll(".menu-link").forEach(item => item.classList.remove("active"));
 
   document.getElementById(`sec-${secao}`).classList.add("active-section");
   document.querySelector(`.menu-link[data-section="${secao}"]`).classList.add("active");
@@ -247,7 +267,8 @@ function mostrarSecao(secao) {
     funcionarios: ["Funcionários", "Cadastre e controle os colaboradores."],
     epis: ["EPIs", "Cadastre e controle os itens entregues."],
     retiradas: ["Ficha de retirada", "Registre a entrega de EPIs e objetos."],
-    historico: ["Histórico", "Acompanhe todas as retiradas registradas."]
+    historico: ["Histórico", "Acompanhe todas as movimentações do módulo."],
+    backup: ["Backup", "Exporte ou importe os dados do sistema."]
   };
 
   document.getElementById("tituloSecao").textContent = titulos[secao][0];
@@ -258,7 +279,7 @@ function atualizarTudo() {
   atualizarDashboard();
   renderFuncionarios();
   renderEpis();
-  renderRetiradas();
+  renderHistoricoEpi();
 }
 
 document.getElementById("formFuncionario").addEventListener("submit", function (e) {
@@ -276,15 +297,14 @@ document.getElementById("formFuncionario").addEventListener("submit", function (
     lista = lista.map(item =>
       item.id === Number(idEdicao) ? { ...item, nome, cargo, setor, matricula } : item
     );
+    registrarHistorico("EPI", "Edição", `Funcionário atualizado: ${nome}`);
     document.getElementById("mensagemFuncionario").textContent = "Funcionário atualizado com sucesso!";
   } else {
     lista.push({
       id: lista.length ? Math.max(...lista.map(item => item.id)) + 1 : 1,
-      nome,
-      cargo,
-      setor,
-      matricula
+      nome, cargo, setor, matricula
     });
+    registrarHistorico("EPI", "Cadastro", `Funcionário cadastrado: ${nome}`);
     document.getElementById("mensagemFuncionario").textContent = "Funcionário cadastrado com sucesso!";
   }
 
@@ -317,17 +337,14 @@ document.getElementById("formEpi").addEventListener("submit", function (e) {
     lista = lista.map(item =>
       item.id === Number(idEdicao) ? { ...item, nome, categoria, ca, estoque, minimo, validade } : item
     );
+    registrarHistorico("EPI", "Edição", `EPI atualizado: ${nome}`);
     document.getElementById("mensagemEpi").textContent = "EPI atualizado com sucesso!";
   } else {
     lista.push({
       id: lista.length ? Math.max(...lista.map(item => item.id)) + 1 : 1,
-      nome,
-      categoria,
-      ca,
-      estoque,
-      minimo,
-      validade
+      nome, categoria, ca, estoque, minimo, validade
     });
+    registrarHistorico("EPI", "Cadastro", `EPI cadastrado: ${nome}`);
     document.getElementById("mensagemEpi").textContent = "EPI cadastrado com sucesso!";
   }
 
@@ -353,6 +370,7 @@ document.getElementById("formRetirada").addEventListener("submit", function (e) 
   const responsavel = document.getElementById("responsavelEntrega").value;
   const assinatura = document.getElementById("assinaturaRetirada").value;
   const observacao = document.getElementById("observacaoRetirada").value;
+  const assinaturaImagem = assinaturaPad.isEmpty() ? "" : assinaturaPad.toDataURL();
 
   const funcionario = obterFuncionarios().find(item => item.id === funcionarioId);
   const epi = obterEpis().find(item => item.id === epiId);
@@ -375,6 +393,7 @@ document.getElementById("formRetirada").addEventListener("submit", function (e) 
     data,
     responsavel,
     assinatura,
+    assinaturaImagem,
     observacao
   });
   salvarRetiradas(retiradas);
@@ -384,10 +403,81 @@ document.getElementById("formRetirada").addEventListener("submit", function (e) 
   );
   salvarEpis(epis);
 
+  registrarHistorico(
+    "EPI",
+    "Retirada",
+    `${funcionario.nome} retirou ${quantidade} unidade(s) de ${epi.nome}`
+  );
+
   document.getElementById("mensagemRetirada").style.color = "#15803d";
   document.getElementById("mensagemRetirada").textContent = "Retirada registrada com sucesso!";
-  this.reset();
+  atualizarPreviaFicha();
+  renderRetiradas();
   atualizarTudo();
+  this.reset();
+  assinaturaPad.clear();
+});
+
+document.getElementById("btnImprimirFicha").addEventListener("click", function () {
+  atualizarPreviaFicha();
+  window.print();
+});
+
+document.getElementById("btnPdfFicha").addEventListener("click", function () {
+  atualizarPreviaFicha();
+
+  const elemento = document.getElementById("conteudoFicha");
+  html2pdf().from(elemento).set({
+    margin: 10,
+    filename: "ficha-entrega-epi.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  }).save();
+
+  registrarHistorico("EPI", "PDF", "Ficha de entrega gerada em PDF");
+});
+
+document.getElementById("btnExportarBackup").addEventListener("click", function () {
+  exportarBackupCompleto();
+  document.getElementById("mensagemBackup").textContent = "Backup exportado com sucesso!";
+});
+
+document.getElementById("arquivoBackup").addEventListener("change", function () {
+  const arquivo = this.files[0];
+  if (!arquivo) return;
+
+  importarBackupCompleto(arquivo, function (sucesso) {
+    document.getElementById("mensagemBackup").textContent = sucesso
+      ? "Backup importado com sucesso!"
+      : "Erro ao importar backup.";
+    if (sucesso) {
+      atualizarTudo();
+      location.reload();
+    }
+  });
+});
+
+document.getElementById("limparAssinatura").addEventListener("click", function () {
+  assinaturaPad.clear();
+  atualizarPreviaFicha();
+});
+
+document.getElementById("fecharModalQr").addEventListener("click", function () {
+  document.getElementById("modalQr").classList.add("hidden");
+});
+
+[
+  "retiradaFuncionario",
+  "retiradaEpi",
+  "quantidadeRetirada",
+  "dataRetirada",
+  "responsavelEntrega",
+  "assinaturaRetirada",
+  "observacaoRetirada"
+].forEach(id => {
+  document.getElementById(id).addEventListener("input", atualizarPreviaFicha);
+  document.getElementById(id).addEventListener("change", atualizarPreviaFicha);
 });
 
 document.querySelectorAll(".menu-link").forEach(link => {
@@ -397,6 +487,11 @@ document.querySelectorAll(".menu-link").forEach(link => {
   });
 });
 
-criarDadosIniciais();
-atualizarTudo();
-mostrarSecao("dashboard");
+window.addEventListener("load", function () {
+  const canvas = document.getElementById("canvasAssinatura");
+  assinaturaPad = new SignaturePad(canvas);
+  criarDadosIniciais();
+  atualizarTudo();
+  mostrarSecao("dashboard");
+  atualizarPreviaFicha();
+});
