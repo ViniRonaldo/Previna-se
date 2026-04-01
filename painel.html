@@ -18,17 +18,17 @@
         <div class="logo-box">
           <div class="logo-icon">🧯</div>
           <div>
-            <h2>Previna-se</h2>
+            <h2 id="nomeEmpresaSidebar">Previna-se</h2>
             <p>Painel interno</p>
           </div>
         </div>
 
         <nav class="menu">
-          <a href="#" class="active">Dashboard</a>
-          <a href="#">Extintores</a>
-          <a href="#">Inspeções</a>
-          <a href="#">Relatórios</a>
-          <a href="#">Configurações</a>
+          <a href="#" class="menu-link active" data-section="dashboard">Dashboard</a>
+          <a href="#" class="menu-link" data-section="extintores">Extintores</a>
+          <a href="#" class="menu-link" data-section="inspecoes">Inspeções</a>
+          <a href="#" class="menu-link" data-section="relatorios">Relatórios</a>
+          <a href="#" class="menu-link" data-section="configuracoes">Configurações</a>
         </nav>
       </div>
 
@@ -38,133 +38,301 @@
     <main class="main-content">
       <header class="topbar">
         <div>
-          <h1>Controle de Extintores</h1>
-          <p>Acompanhe status, vencimentos e inspeções em tempo real.</p>
+          <h1 id="tituloSecao">Controle de Extintores</h1>
+          <p id="subtituloSecao">Acompanhe status, vencimentos e inspeções em tempo real.</p>
         </div>
         <div class="user-box">Usuário interno</div>
       </header>
 
-      <section class="cards">
-        <div class="card info-card red">
-          <span>Total de extintores</span>
-          <strong>48</strong>
+      <!-- DASHBOARD -->
+      <section id="sec-dashboard" class="section-content active-section">
+        <section class="cards">
+          <div class="card info-card red">
+            <span>Total de extintores</span>
+            <strong id="totalExtintores">0</strong>
+          </div>
+
+          <div class="card info-card yellow">
+            <span>Próximos do vencimento</span>
+            <strong id="totalProximos">0</strong>
+          </div>
+
+          <div class="card info-card green">
+            <span>Em dia</span>
+            <strong id="totalEmDia">0</strong>
+          </div>
+
+          <div class="card info-card dark">
+            <span>Vencidos</span>
+            <strong id="totalVencidos">0</strong>
+          </div>
+        </section>
+
+        <section class="dashboard-grid">
+          <div class="card chart-card">
+            <div class="section-title">
+              <h2>Controle geral</h2>
+              <p>Distribuição atual dos extintores</p>
+            </div>
+            <div class="chart-container">
+              <canvas id="graficoExtintores"></canvas>
+            </div>
+          </div>
+
+          <div class="card alerts-card">
+            <div class="section-title">
+              <h2>Alertas rápidos</h2>
+              <p>Itens que merecem atenção</p>
+            </div>
+
+            <div class="alert-item danger">
+              <strong id="alertaVencidos">0 extintores vencidos</strong>
+              <span>Necessário realizar troca ou recarga imediata.</span>
+            </div>
+
+            <div class="alert-item warning">
+              <strong id="alertaProximos">0 próximos do vencimento</strong>
+              <span>Validade termina dentro do período de alerta.</span>
+            </div>
+
+            <div class="alert-item success">
+              <strong id="alertaEmDia">0 extintores em dia</strong>
+              <span>Todos com manutenção regularizada.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="card table-card">
+          <div class="section-title table-header">
+            <div>
+              <h2>Últimos extintores cadastrados</h2>
+              <p>Visualização rápida do sistema</p>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tipo</th>
+                  <th>Local</th>
+                  <th>Validade</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaDashboard"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- EXTINTORES -->
+      <section id="sec-extintores" class="section-content">
+        <div class="card form-card">
+          <div class="section-title">
+            <h2>Cadastrar extintor</h2>
+            <p>Adicione um novo equipamento ao controle</p>
+          </div>
+
+          <form id="formExtintor" class="grid-form">
+            <input type="hidden" id="extintorIdEdicao">
+
+            <div>
+              <label for="tipo">Tipo</label>
+              <select id="tipo" required>
+                <option value="">Selecione</option>
+                <option value="Pó Químico">Pó Químico</option>
+                <option value="CO₂">CO₂</option>
+                <option value="Água Pressurizada">Água Pressurizada</option>
+                <option value="Espuma Mecânica">Espuma Mecânica</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="local">Local</label>
+              <input type="text" id="local" required>
+            </div>
+
+            <div>
+              <label for="validade">Validade</label>
+              <input type="date" id="validade" required>
+            </div>
+
+            <div>
+              <label for="numeroSerie">Número de série</label>
+              <input type="text" id="numeroSerie" required>
+            </div>
+
+            <div class="full-width actions-inline">
+              <button type="submit" class="new-btn">Salvar extintor</button>
+              <button type="button" id="cancelarEdicao" class="secondary-btn">Cancelar edição</button>
+            </div>
+          </form>
+
+          <p id="mensagemExtintor" class="mensagem-form"></p>
         </div>
 
-        <div class="card info-card yellow">
-          <span>Próximos do vencimento</span>
-          <strong>12</strong>
-        </div>
+        <div class="card table-card">
+          <div class="section-title table-header">
+            <div>
+              <h2>Lista de extintores</h2>
+              <p>Controle interno por setor e validade</p>
+            </div>
+          </div>
 
-        <div class="card info-card green">
-          <span>Em dia</span>
-          <strong>30</strong>
-        </div>
-
-        <div class="card info-card dark">
-          <span>Vencidos</span>
-          <strong>6</strong>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tipo</th>
+                  <th>Local</th>
+                  <th>Série</th>
+                  <th>Validade</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaExtintores"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <section class="dashboard-grid">
-        <div class="card chart-card">
+      <!-- INSPEÇÕES -->
+      <section id="sec-inspecoes" class="section-content">
+        <div class="card form-card">
           <div class="section-title">
-            <h2>Controle geral</h2>
-            <p>Distribuição atual dos extintores</p>
+            <h2>Registrar inspeção</h2>
+            <p>Adicione uma nova inspeção ao sistema</p>
           </div>
-          <div class="chart-container">
-            <canvas id="graficoExtintores"></canvas>
-          </div>
+
+          <form id="formInspecao" class="grid-form">
+            <div>
+              <label for="inspecaoExtintor">Extintor</label>
+              <select id="inspecaoExtintor" required></select>
+            </div>
+
+            <div>
+              <label for="dataInspecao">Data da inspeção</label>
+              <input type="date" id="dataInspecao" required>
+            </div>
+
+            <div>
+              <label for="responsavelInspecao">Responsável</label>
+              <input type="text" id="responsavelInspecao" required>
+            </div>
+
+            <div>
+              <label for="resultadoInspecao">Resultado</label>
+              <select id="resultadoInspecao" required>
+                <option value="">Selecione</option>
+                <option value="Aprovado">Aprovado</option>
+                <option value="Manutenção necessária">Manutenção necessária</option>
+                <option value="Reprovado">Reprovado</option>
+              </select>
+            </div>
+
+            <div class="full-width">
+              <label for="observacoesInspecao">Observações</label>
+              <textarea id="observacoesInspecao" rows="4"></textarea>
+            </div>
+
+            <div class="full-width">
+              <button type="submit" class="new-btn">Registrar inspeção</button>
+            </div>
+          </form>
+
+          <p id="mensagemInspecao" class="mensagem-form"></p>
         </div>
 
-        <div class="card alerts-card">
+        <div class="card table-card">
           <div class="section-title">
-            <h2>Alertas rápidos</h2>
-            <p>Itens que merecem atenção</p>
+            <h2>Histórico de inspeções</h2>
+            <p>Últimos registros do sistema</p>
           </div>
 
-          <div class="alert-item danger">
-            <strong>6 extintores vencidos</strong>
-            <span>Necessário realizar troca ou recarga imediata.</span>
-          </div>
-
-          <div class="alert-item warning">
-            <strong>12 próximos do vencimento</strong>
-            <span>Validade termina nos próximos 30 dias.</span>
-          </div>
-
-          <div class="alert-item success">
-            <strong>30 extintores em dia</strong>
-            <span>Todos com manutenção regularizada.</span>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Extintor</th>
+                  <th>Data</th>
+                  <th>Responsável</th>
+                  <th>Resultado</th>
+                  <th>Observações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaInspecoes"></tbody>
+            </table>
           </div>
         </div>
       </section>
 
-      <section class="card table-card">
-        <div class="section-title table-header">
-          <div>
-            <h2>Lista de extintores</h2>
-            <p>Controle interno por setor e validade</p>
+      <!-- RELATÓRIOS -->
+      <section id="sec-relatorios" class="section-content">
+        <div class="card">
+          <div class="section-title">
+            <h2>Relatório geral</h2>
+            <p>Resumo automático das informações cadastradas</p>
           </div>
-          <button class="new-btn">+ Novo extintor</button>
+
+          <div class="relatorio-grid">
+            <div class="relatorio-box">
+              <h3>Total de extintores</h3>
+              <strong id="relatorioTotal">0</strong>
+            </div>
+            <div class="relatorio-box">
+              <h3>Total de inspeções</h3>
+              <strong id="relatorioInspecoes">0</strong>
+            </div>
+            <div class="relatorio-box">
+              <h3>Extintores vencidos</h3>
+              <strong id="relatorioVencidos">0</strong>
+            </div>
+            <div class="relatorio-box">
+              <h3>Próximos do vencimento</h3>
+              <strong id="relatorioProximos">0</strong>
+            </div>
+          </div>
         </div>
 
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tipo</th>
-                <th>Local</th>
-                <th>Validade</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>001</td>
-                <td>Pó Químico</td>
-                <td>Recepção</td>
-                <td>15/04/2026</td>
-                <td><span class="status status-warning">Próximo</span></td>
-              </tr>
-              <tr>
-                <td>002</td>
-                <td>CO₂</td>
-                <td>Almoxarifado</td>
-                <td>02/11/2026</td>
-                <td><span class="status status-ok">Em dia</span></td>
-              </tr>
-              <tr>
-                <td>003</td>
-                <td>Água Pressurizada</td>
-                <td>Corredor A</td>
-                <td>28/03/2026</td>
-                <td><span class="status status-danger">Vencido</span></td>
-              </tr>
-              <tr>
-                <td>004</td>
-                <td>Pó Químico</td>
-                <td>Sala TI</td>
-                <td>10/05/2026</td>
-                <td><span class="status status-warning">Próximo</span></td>
-              </tr>
-              <tr>
-                <td>005</td>
-                <td>CO₂</td>
-                <td>Cozinha</td>
-                <td>20/12/2026</td>
-                <td><span class="status status-ok">Em dia</span></td>
-              </tr>
-              <tr>
-                <td>006</td>
-                <td>Espuma Mecânica</td>
-                <td>Estoque</td>
-                <td>11/03/2026</td>
-                <td><span class="status status-danger">Vencido</span></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="card">
+          <div class="section-title">
+            <h2>Relatório por status</h2>
+            <p>Resumo textual para consulta rápida</p>
+          </div>
+
+          <div id="textoRelatorio" class="texto-relatorio"></div>
+        </div>
+      </section>
+
+      <!-- CONFIGURAÇÕES -->
+      <section id="sec-configuracoes" class="section-content">
+        <div class="card form-card">
+          <div class="section-title">
+            <h2>Configurações do sistema</h2>
+            <p>Personalize o funcionamento do painel</p>
+          </div>
+
+          <form id="formConfiguracoes" class="grid-form">
+            <div>
+              <label for="nomeEmpresa">Nome da empresa</label>
+              <input type="text" id="nomeEmpresa" required>
+            </div>
+
+            <div>
+              <label for="diasAlerta">Dias para alerta de vencimento</label>
+              <input type="number" id="diasAlerta" min="1" required>
+            </div>
+
+            <div class="full-width">
+              <button type="submit" class="new-btn">Salvar configurações</button>
+            </div>
+          </form>
+
+          <p id="mensagemConfig" class="mensagem-form"></p>
         </div>
       </section>
     </main>

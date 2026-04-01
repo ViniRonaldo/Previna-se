@@ -22,7 +22,8 @@ app.use(
   })
 );
 
-app.use(express.static(path.join(__dirname, "public")));
+
+app.use(express.static(__dirname));
 
 function protegerRota(req, res, next) {
   if (req.session.usuarioLogado) {
@@ -33,7 +34,7 @@ function protegerRota(req, res, next) {
 }
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.post("/login", (req, res) => {
@@ -56,7 +57,7 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/painel", protegerRota, (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "painel.html"));
+  res.sendFile(path.join(__dirname, "painel.html"));
 });
 
 app.get("/logout", (req, res) => {
