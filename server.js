@@ -66,6 +66,12 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get("/modulos", protegerRota, (req, res) => {
+  res.sendFile(path.join(__dirname, "modulos.html"));
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
+
 });
+

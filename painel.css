@@ -415,3 +415,27 @@ th {
     align-items: flex-start;
   }
 }
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.back-btn,
+.logout-btn {
+  text-decoration: none;
+  color: white;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: 0.3s;
+  text-align: center;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.08);
+}
+
+.back-btn:hover,
+.logout-btn:hover {
+  background: rgba(255,255,255,0.12);
+}

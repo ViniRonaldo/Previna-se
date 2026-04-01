@@ -23,7 +23,7 @@ formLogin.addEventListener("submit", async function (event) {
       mensagem.textContent = dados.mensagem;
 
       setTimeout(() => {
-        window.location.href = "/painel";
+        window.location.href = "/modulos";
       }, 1000);
     } else {
       mensagem.style.color = "red";
