@@ -181,21 +181,37 @@ function atualizarSelects() {
 }
 
 function atualizarPreviaFicha() {
-  const funcionarioSelect = document.getElementById("retiradaFuncionario");
-  const epiSelect = document.getElementById("retiradaEpi");
+  const funcionarioId = Number(document.getElementById("retiradaFuncionario").value);
+  const epiId = Number(document.getElementById("retiradaEpi").value);
 
-  document.getElementById("prevFuncionario").textContent = funcionarioSelect.options[funcionarioSelect.selectedIndex]?.text || "-";
-  document.getElementById("prevItem").textContent = epiSelect.options[epiSelect.selectedIndex]?.text || "-";
-  document.getElementById("prevQuantidade").textContent = document.getElementById("quantidadeRetirada").value || "-";
-  document.getElementById("prevData").textContent = formatarData(document.getElementById("dataRetirada").value) || "-";
-  document.getElementById("prevResponsavel").textContent = document.getElementById("responsavelEntrega").value || "-";
-  document.getElementById("prevAssinaturaDigitada").textContent = document.getElementById("assinaturaRetirada").value || "-";
-  document.getElementById("prevObservacao").textContent = document.getElementById("observacaoRetirada").value || "-";
+  const funcionario = obterFuncionarios().find(item => item.id === funcionarioId);
+  const epi = obterEpis().find(item => item.id === epiId);
 
-  if (!assinaturaPad.isEmpty()) {
-    document.getElementById("prevAssinaturaImagem").src = assinaturaPad.toDataURL();
+  const quantidade = document.getElementById("quantidadeRetirada").value || "-";
+  const data = document.getElementById("dataRetirada").value;
+  const assinaturaDigitada = document.getElementById("assinaturaRetirada").value || "-";
+  const observacao = document.getElementById("observacaoRetirada").value || "-";
+
+  document.getElementById("pdfNome").textContent = funcionario ? funcionario.nome : "-";
+  document.getElementById("pdfRegistro").textContent = funcionario ? funcionario.matricula : "-";
+  document.getElementById("pdfAdmissao").textContent = "____/____/________";
+  document.getElementById("pdfFuncao").textContent = funcionario ? funcionario.cargo : "-";
+  document.getElementById("pdfSetor").textContent = funcionario ? funcionario.setor : "-";
+
+  document.getElementById("pdfDataAssinatura").textContent = data ? formatarData(data) : "____/____/________";
+  document.getElementById("pdfDataRetirei").textContent = data ? formatarData(data) : "-";
+  document.getElementById("pdfQuantidade").textContent = quantidade;
+  document.getElementById("pdfUnidade").textContent = "UN";
+  document.getElementById("pdfDescricaoEquipamento").textContent = epi ? epi.nome : "-";
+  document.getElementById("pdfCA").textContent = epi ? epi.ca : "-";
+  document.getElementById("pdfAssinaturaNome").textContent = assinaturaDigitada;
+  document.getElementById("pdfObservacao").textContent = observacao;
+
+  const imgAss = document.getElementById("pdfAssinaturaImagem");
+  if (assinaturaPad && !assinaturaPad.isEmpty()) {
+    imgAss.src = assinaturaPad.toDataURL();
   } else {
-    document.getElementById("prevAssinaturaImagem").src = "";
+    imgAss.src = "";
   }
 }
 
@@ -412,7 +428,6 @@ document.getElementById("formRetirada").addEventListener("submit", function (e) 
   document.getElementById("mensagemRetirada").style.color = "#15803d";
   document.getElementById("mensagemRetirada").textContent = "Retirada registrada com sucesso!";
   atualizarPreviaFicha();
-  renderRetiradas();
   atualizarTudo();
   this.reset();
   assinaturaPad.clear();
@@ -428,11 +443,11 @@ document.getElementById("btnPdfFicha").addEventListener("click", function () {
 
   const elemento = document.getElementById("conteudoFicha");
   html2pdf().from(elemento).set({
-    margin: 10,
+    margin: 6,
     filename: "ficha-entrega-epi.pdf",
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2 },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
   }).save();
 
   registrarHistorico("EPI", "PDF", "Ficha de entrega gerada em PDF");
@@ -451,6 +466,7 @@ document.getElementById("arquivoBackup").addEventListener("change", function () 
     document.getElementById("mensagemBackup").textContent = sucesso
       ? "Backup importado com sucesso!"
       : "Erro ao importar backup.";
+
     if (sucesso) {
       atualizarTudo();
       location.reload();
@@ -490,6 +506,7 @@ document.querySelectorAll(".menu-link").forEach(link => {
 window.addEventListener("load", function () {
   const canvas = document.getElementById("canvasAssinatura");
   assinaturaPad = new SignaturePad(canvas);
+
   criarDadosIniciais();
   atualizarTudo();
   mostrarSecao("dashboard");

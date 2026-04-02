@@ -48,6 +48,7 @@
         </div>
       </header>
 
+      <!-- DASHBOARD -->
       <section id="sec-dashboard" class="section-content active-section">
         <section class="cards">
           <div class="card info-card blue">
@@ -109,6 +110,7 @@
         </section>
       </section>
 
+      <!-- FUNCIONÁRIOS -->
       <section id="sec-funcionarios" class="section-content">
         <div class="card form-card">
           <div class="section-title">
@@ -171,6 +173,7 @@
         </div>
       </section>
 
+      <!-- EPIS -->
       <section id="sec-epis" class="section-content">
         <div class="card form-card">
           <div class="section-title">
@@ -245,6 +248,7 @@
         </div>
       </section>
 
+      <!-- RETIRADAS -->
       <section id="sec-retiradas" class="section-content">
         <div class="card form-card">
           <div class="section-title">
@@ -309,26 +313,107 @@
         <div class="card" id="fichaEntrega">
           <div class="section-title">
             <h2>Prévia da ficha de entrega</h2>
-            <p>Use para imprimir ou gerar PDF</p>
+            <p>Modelo pronto para impressão e PDF</p>
           </div>
 
-          <div class="ficha-box" id="conteudoFicha">
-            <h3>Ficha de Entrega de EPI</h3>
-            <p><strong>Funcionário:</strong> <span id="prevFuncionario">-</span></p>
-            <p><strong>Item:</strong> <span id="prevItem">-</span></p>
-            <p><strong>Quantidade:</strong> <span id="prevQuantidade">-</span></p>
-            <p><strong>Data:</strong> <span id="prevData">-</span></p>
-            <p><strong>Responsável:</strong> <span id="prevResponsavel">-</span></p>
-            <p><strong>Confirmação:</strong> <span id="prevAssinaturaDigitada">-</span></p>
-            <p><strong>Observação:</strong> <span id="prevObservacao">-</span></p>
-            <div class="assinatura-preview">
-              <strong>Assinatura digital:</strong>
-              <img id="prevAssinaturaImagem" alt="Assinatura digital">
+          <div class="ficha-pdf" id="conteudoFicha">
+            <table class="ficha-topo">
+              <tr>
+                <td class="logo-empresa">Logotipo da<br>Empresa</td>
+                <td class="titulo-ficha">FICHA DE CONTROLE E ENTREGA DE EPI</td>
+              </tr>
+            </table>
+
+            <table class="ficha-dados">
+              <tr>
+                <td colspan="2"><strong>NOME:</strong> <span id="pdfNome">-</span></td>
+                <td><strong>Nº DE REGISTRO:</strong> <span id="pdfRegistro">-</span></td>
+                <td><strong>DATA ADMISSÃO:</strong> <span id="pdfAdmissao">-</span></td>
+              </tr>
+              <tr>
+                <td><strong>FUNÇÃO:</strong> <span id="pdfFuncao">-</span></td>
+                <td><strong>SEÇÃO:</strong> <span id="pdfSetor">-</span></td>
+                <td colspan="2"><strong>DATA DEMISSÃO:</strong> __________________</td>
+              </tr>
+            </table>
+
+            <div class="ficha-termo">
+              <p>
+                Confirmo que recebi os <strong>EPI´s</strong> (Equipamentos de proteção Individual)
+                para meu uso obrigatório, observando as recomendações da NR 06.
+              </p>
+              <p>
+                Declaro ciente que terei que devolvê-los caso ocorra meu desligamento da empresa.
+              </p>
+
+              <div class="linha-assinatura-area">
+                <div class="linha-data">
+                  <span>DATA</span>
+                  <div class="linha-campo">
+                    <span id="pdfDataAssinatura">____/____/________</span>
+                  </div>
+                </div>
+
+                <div class="linha-ass-func">
+                  <span>ASSINATURA DO FUNCIONÁRIO</span>
+                  <div class="linha-campo assinatura-campo-pdf">
+                    <img id="pdfAssinaturaImagem" alt="Assinatura do funcionário">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <table class="ficha-itens">
+              <thead>
+                <tr>
+                  <th colspan="2">DATA</th>
+                  <th>QUANT.</th>
+                  <th>UNID.</th>
+                  <th>DESCRIÇÃO DO EQUIPAMENTO</th>
+                  <th>Nº DO C.A.</th>
+                  <th>ASSINATURA</th>
+                </tr>
+                <tr>
+                  <th>RETIREI</th>
+                  <th>DEVOLVI</th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="linhasFichaPdf">
+                <tr>
+                  <td id="pdfDataRetirei">-</td>
+                  <td></td>
+                  <td id="pdfQuantidade">-</td>
+                  <td id="pdfUnidade">UN</td>
+                  <td id="pdfDescricaoEquipamento">-</td>
+                  <td id="pdfCA">-</td>
+                  <td id="pdfAssinaturaNome">-</td>
+                </tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              </tbody>
+            </table>
+
+            <div class="observacao-pdf">
+              <strong>OBSERVAÇÃO:</strong> <span id="pdfObservacao">-</span>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- HISTÓRICO -->
       <section id="sec-historico" class="section-content">
         <div class="card">
           <div class="section-title">
@@ -352,6 +437,7 @@
         </div>
       </section>
 
+      <!-- BACKUP -->
       <section id="sec-backup" class="section-content">
         <div class="card">
           <div class="section-title">

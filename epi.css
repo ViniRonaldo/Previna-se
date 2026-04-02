@@ -162,21 +162,10 @@ body {
   font-size: 34px;
 }
 
-.blue strong {
-  color: var(--blue);
-}
-
-.green strong {
-  color: var(--green);
-}
-
-.yellow strong {
-  color: var(--yellow);
-}
-
-.red strong {
-  color: var(--red);
-}
+.blue strong { color: var(--blue); }
+.green strong { color: var(--green); }
+.yellow strong { color: var(--yellow); }
+.red strong { color: var(--red); }
 
 .section-title h2 {
   font-size: 22px;
@@ -350,38 +339,6 @@ th {
   margin-top: 12px;
 }
 
-.ficha-box {
-  margin-top: 18px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 18px;
-  line-height: 1.8;
-}
-
-.ficha-box h3 {
-  margin-bottom: 12px;
-  font-size: 20px;
-}
-
-.ficha-box p {
-  margin-bottom: 6px;
-}
-
-.assinatura-preview {
-  margin-top: 14px;
-}
-
-.assinatura-preview img {
-  margin-top: 10px;
-  max-width: 250px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-  display: block;
-  min-height: 60px;
-}
-
 .modal {
   position: fixed;
   inset: 0;
@@ -432,6 +389,125 @@ th {
   min-height: 220px;
 }
 
+/* FICHA PDF */
+.ficha-pdf {
+  background: #fff;
+  color: #111;
+  border: 1px solid #222;
+  padding: 0;
+  margin-top: 18px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.ficha-pdf table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ficha-pdf td,
+.ficha-pdf th {
+  border: 1px solid #222;
+  padding: 6px 8px;
+  vertical-align: middle;
+}
+
+.ficha-topo .logo-empresa {
+  width: 160px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.ficha-topo .titulo-ficha {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px;
+}
+
+.ficha-dados td {
+  font-size: 13px;
+}
+
+.ficha-termo {
+  padding: 16px 12px 10px;
+  border-left: 1px solid #222;
+  border-right: 1px solid #222;
+  border-bottom: 1px solid #222;
+}
+
+.ficha-termo p {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.linha-assinatura-area {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 14px;
+  align-items: flex-end;
+}
+
+.linha-data,
+.linha-ass-func {
+  flex: 1;
+}
+
+.linha-data span,
+.linha-ass-func span {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.linha-campo {
+  border-top: 1px solid #222;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.assinatura-campo-pdf {
+  min-height: 60px;
+}
+
+.assinatura-campo-pdf img {
+  max-height: 55px;
+  max-width: 260px;
+  object-fit: contain;
+}
+
+.ficha-itens th {
+  font-size: 13px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.ficha-itens td {
+  height: 28px;
+  font-size: 13px;
+}
+
+.ficha-itens tbody tr td {
+  text-align: center;
+}
+
+.ficha-itens tbody tr td:nth-child(5) {
+  text-align: left;
+}
+
+.observacao-pdf {
+  border: 1px solid #222;
+  border-top: none;
+  padding: 10px;
+  font-size: 13px;
+  min-height: 42px;
+}
+
 @media print {
   body * {
     visibility: hidden;
@@ -448,7 +524,9 @@ th {
     top: 0;
     width: 100%;
     background: white;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
+    border: none;
   }
 }
 
@@ -483,5 +561,9 @@ th {
 
   .sidebar-actions {
     margin-top: 20px;
+  }
+
+  .linha-assinatura-area {
+    flex-direction: column;
   }
 }

@@ -60,36 +60,15 @@ function importarBackupCompleto(arquivo, callback) {
     try {
       const dados = JSON.parse(evento.target.result);
 
-      if (dados.extintores_previna) {
-        localStorage.setItem("extintores_previna", JSON.stringify(dados.extintores_previna));
-      }
-
-      if (dados.inspecoes_previna) {
-        localStorage.setItem("inspecoes_previna", JSON.stringify(dados.inspecoes_previna));
-      }
-
-      if (dados.config_previna) {
-        localStorage.setItem("config_previna", JSON.stringify(dados.config_previna));
-      }
-
-      if (dados.epi_funcionarios) {
-        localStorage.setItem("epi_funcionarios", JSON.stringify(dados.epi_funcionarios));
-      }
-
-      if (dados.epi_itens) {
-        localStorage.setItem("epi_itens", JSON.stringify(dados.epi_itens));
-      }
-
-      if (dados.epi_retiradas) {
-        localStorage.setItem("epi_retiradas", JSON.stringify(dados.epi_retiradas));
-      }
-
-      if (dados.historico_geral_previna) {
-        localStorage.setItem("historico_geral_previna", JSON.stringify(dados.historico_geral_previna));
-      }
+      if (dados.extintores_previna) localStorage.setItem("extintores_previna", JSON.stringify(dados.extintores_previna));
+      if (dados.inspecoes_previna) localStorage.setItem("inspecoes_previna", JSON.stringify(dados.inspecoes_previna));
+      if (dados.config_previna) localStorage.setItem("config_previna", JSON.stringify(dados.config_previna));
+      if (dados.epi_funcionarios) localStorage.setItem("epi_funcionarios", JSON.stringify(dados.epi_funcionarios));
+      if (dados.epi_itens) localStorage.setItem("epi_itens", JSON.stringify(dados.epi_itens));
+      if (dados.epi_retiradas) localStorage.setItem("epi_retiradas", JSON.stringify(dados.epi_retiradas));
+      if (dados.historico_geral_previna) localStorage.setItem("historico_geral_previna", JSON.stringify(dados.historico_geral_previna));
 
       registrarHistorico("Sistema", "Backup", "Backup completo importado");
-
       if (callback) callback(true);
     } catch (erro) {
       if (callback) callback(false);
